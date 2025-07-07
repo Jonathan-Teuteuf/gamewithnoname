@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Country Guesser</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="top-left-controls">
+        <button id="dark-mode-toggle">🌙 Dark Mode</button>
+        <div class="gap"></div>
+        <button id="info-btn" title="Game Rules">ℹ️ How to Play</button>
+    </div>
+    <div class="container">
+        <h1>Country Guesser</h1>
+        <div id="image-container">
+            <img id="country-image" src="https://cdn.pixabay.com/photo/2015/12/23/23/15/question-mark-1106309_1280.png" alt="Country Flag or Question Mark">
+        </div>
+        <div id="hint-container">
+            <span id="hint-label">Hint 1:</span>
+            <span id="hint"></span>
+        </div>
+        <form id="guess-form">
+            <input type="text" id="guess-input" placeholder="Enter your guess" autocomplete="off" required list="countries-list" />
+            <datalist id="countries-list"></datalist>
+            <button type="submit" id="submit-btn">Submit</button>
+        </form>
+        <div id="result"></div>
+        <div id="guesses-info"></div>
+        <div id="countdown-container">
+            <span>Next game in: </span><span id="countdown"></span>
+        </div>
+    </div>
+    <div id="rules-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <button class="close-modal" id="close-rules">&times;</button>
+            <h2>How to Play</h2>
+            <ul>
+                <li>The aim of this game is to guess the country in as few guesses as possible.</li>
+                <li>Every day a new country is chosen and you get 10 hints, one at a time to guess it.</li>
+                <li>e.g if the country of the day is "United Kingdom", the first hint might be "It is located in Europe".</li>
+                <li>Enter your guess after each hint. You have one guess per hint.</li>
+                <li>If you guess correctly, the flag is revealed and you win!</li>
+                <li>If you use all 10 hints, you lose and the answer and flag are revealed.</li>
+                <li>The game resets with a new country every day at 12:00 AM British time.</li>
+                <li><b>Disclaimer:</b> This game only includes countries that are full members of the United Nations. Disputed territories or partially recognized states are not part of the game.</li>
+            </ul>
+        </div>
+    </div>
+    <footer class="site-footer">© 2025 Jonathan Williams. All rights reserved.</footer>
+    <script src="script.js"></script>
+</body>
+</html> 
