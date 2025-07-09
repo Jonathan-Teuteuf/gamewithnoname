@@ -12,19 +12,18 @@ const QUESTION_MARK_IMG = "https://cdn.pixabay.com/photo/2015/12/23/23/15/questi
 
 // Full list of country names for autocomplete
 const ALL_COUNTRY_NAMES = [
-  "Afghanistan","Albania","Algeria","Andorra","Angola","Antigua & Deps","Argentina","Armenia","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bhutan","Bolivia","Bosnia Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina","Burundi","Cambodia","Cameroon","Canada","Cape Verde","Central African Rep","Chad","Chile","China","Colombia","Comoros","Congo","Congo {Democratic Rep}","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","East Timor","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Ethiopia","Fiji","Finland","France","Gabon","Gambia","Georgia","Germany","Ghana","Greece","Grenada","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland {Republic}","Israel","Italy","Ivory Coast","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kiribati","Korea North","Korea South","Kosovo","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Morocco","Mozambique","Myanmar, {Burma}","Namibia","Nauru","Nepal","Netherlands","New Zealand","Nicaragua","Niger","Nigeria","Norway","Oman","Pakistan","Palau","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Qatar","Romania","Russian Federation","Rwanda","St Kitts & Nevis","St Lucia","Saint Vincent & the Grenadines","Samoa","San Marino","Sao Tome & Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Sudan","Spain","Sri Lanka","Sudan","Suriname","Swaziland","Sweden","Switzerland","Syria","Tajikistan","Tanzania","Thailand","Togo","Tonga","Trinidad & Tobago","Tunisia","Turkey","Turkmenistan","Tuvalu","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan","Vanuatu","Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"
+  "Afghanistan","Albania","Algeria","Andorra","Angola","Antigua & Deps","Argentina","Armenia","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bhutan","Bolivia","Bosnia Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina","Burundi","Cambodia","Cameroon","Canada","Cape Verde","Central African Rep","Chad","Chile","China","Colombia","Comoros","Congo","Congo {Democratic Rep}","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","East Timor","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Ethiopia","Fiji","Finland","France","Gabon","Gambia","Georgia","Germany","Ghana","Greece","Grenada","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland {Republic}","Israel","Italy","Ivory Coast","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kiribati","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Morocco","Mozambique","Myanmar, {Burma}","Namibia","Nauru","Nepal","Netherlands","New Zealand","Nicaragua","Niger","Nigeria","North Korea","Norway","Oman","Pakistan","Palau","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Qatar","Romania","Russia","Rwanda","St Kitts & Nevis","St Lucia","Saint Vincent & the Grenadines","Samoa","San Marino","Sao Tome & Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","South Sudan","Spain","Sri Lanka","Sudan","Suriname","Swaziland","Sweden","Switzerland","Syria","Tajikistan","Tanzania","Thailand","Togo","Tonga","Trinidad & Tobago","Tunisia","Turkey","Turkmenistan","Tuvalu","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan","Vanuatu","Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"
 ];
 
 // Deterministically select today's country based on the date
 function getTodayCountryIndex() {
+    // Start date: 8th July 2025 (months are 0-based, so 6 = July)
+    const startDate = new Date(2025, 6, 8);
     const dateToUse = TEST_MODE ? virtualDate : new Date();
-    const ymd = dateToUse.getFullYear() + '-' + (dateToUse.getMonth()+1) + '-' + dateToUse.getDate();
-    // Simple hash: sum char codes mod countries.length
-    let hash = 0;
-    for (let i = 0; i < ymd.length; i++) {
-        hash += ymd.charCodeAt(i);
-    }
-    return hash % countries.length;
+    const msPerDay = 24 * 60 * 60 * 1000;
+    const daysSinceStart = Math.floor((dateToUse - startDate) / msPerDay);
+    // Ensure positive and wrap around
+    return ((daysSinceStart % countries.length) + countries.length) % countries.length;
 }
 
 let countryIndex;
@@ -83,6 +82,56 @@ function showQuestionMark() {
     imageElem.alt = 'Country Flag or Question Mark';
 }
 
+// Create share button (hidden by default)
+let shareBtn = document.createElement('button');
+shareBtn.id = 'share-btn';
+shareBtn.textContent = 'Share your score with your friends! ➤';
+shareBtn.style.display = 'none';
+shareBtn.style.marginTop = '16px';
+shareBtn.style.padding = '14px 28px';
+shareBtn.style.fontSize = '1.2rem';
+shareBtn.style.borderRadius = '6px';
+shareBtn.style.background = '#3498db';
+shareBtn.style.color = 'white';
+shareBtn.style.border = 'none';
+shareBtn.style.cursor = 'pointer';
+shareBtn.style.transition = 'background 0.2s';
+shareBtn.addEventListener('mouseover', () => shareBtn.style.background = '#217dbb');
+shareBtn.addEventListener('mouseout', () => shareBtn.style.background = '#3498db');
+
+function showShareButton(success) {
+    let message = '';
+    if (success) {
+        message = `I bet you can't guess this country in less guesses than me! (${guessesUsed} guess${guessesUsed === 1 ? '' : 'es'}) https://jonathanwilliams2008.github.io/country-guesser/`;
+    } else {
+        message = `This country is impossible to guess! https://jonathanwilliams2008.github.io/country-guesser/`;
+    }
+    shareBtn.style.display = '';
+    shareBtn.onclick = function() {
+        // Always copy to clipboard
+        navigator.clipboard.writeText(message).then(() => {
+            shareBtn.textContent = 'Share your score with your friends! ➤';
+            setTimeout(() => {
+                shareBtn.textContent = 'Share your score with your friends! ➤';
+            }, 1500);
+        });
+        // If Web Share API is available, also use it
+        if (navigator.share) {
+            navigator.share({
+                text: message
+            });
+        }
+    };
+    // Insert the share button right after guessesInfoElem
+    if (guessesInfoElem && guessesInfoElem.parentNode) {
+        guessesInfoElem.parentNode.insertBefore(shareBtn, guessesInfoElem.nextSibling);
+    }
+}
+
+function hideShareButton() {
+    shareBtn.style.display = 'none';
+}
+
 function endGame(success) {
     gameOver = true;
     guessInput.disabled = true;
@@ -100,6 +149,7 @@ function endGame(success) {
         guessesInfoElem.textContent = 'You used all 10 guesses.';
         showFlag();
     }
+    showShareButton(success);
 }
 
 function resetGameUI() {
@@ -115,6 +165,7 @@ function resetGameUI() {
     guessForm.style.display = '';
     showQuestionMark();
     showHint();
+    hideShareButton();
 }
 
 
@@ -277,7 +328,8 @@ guessForm.addEventListener('submit', function(e) {
         currentHint++;
         if (currentHint < country.hints.length) {
             showHint();
-            resultElem.textContent = 'Incorrect, try the next hint!';
+            const hintsLeft = country.hints.length - currentHint;
+            resultElem.textContent = `Incorrect, you have ${hintsLeft} hint${hintsLeft === 1 ? '' : 's'} remaining.`;
             resultElem.style.color = '#e67e22';
         } else {
             endGame(false);
@@ -308,4 +360,10 @@ guessInput.addEventListener('click', function() {
     if (guessInput.value.trim().length < 2) {
         guessInput.removeAttribute('list');
     }
+});
+
+// Support Me button logic
+const supportBtn = document.getElementById('support-btn');
+supportBtn.addEventListener('click', function() {
+    window.open('https://buymeacoffee.com/jonathanwilliams', '_blank');
 }); 
