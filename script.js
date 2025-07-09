@@ -297,7 +297,7 @@ window.addEventListener('keydown', (e) => {
 // Add global error logging
 window.onerror = function(message, source, lineno, colno, error) {
     console.error('Global JS Error:', message, source, lineno, colno, error);
-    alert('A JavaScript error occurred. Please check the console for details.');
+    // Removed alert to prevent user confusion when site works fine
 };
 
 // Helper: Only allow guesses that match a country in ALL_COUNTRY_NAMES
