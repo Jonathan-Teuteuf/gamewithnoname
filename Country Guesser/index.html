@@ -22,7 +22,6 @@
     </div>
     <div class="top-left-controls">
         <button id="dark-mode-toggle">🌙 Dark Mode</button>
-        <div class="gap"></div>
         <button id="info-btn" title="Game Rules">ℹ️ How to Play</button>
     </div>
     <div class="container">
@@ -33,6 +32,7 @@
         <div id="hint-container">
             <span id="hint-label">Hint 1:</span>
             <span id="hint"></span>
+            <button id="show-hints-btn" title="Show all previous hints" style="margin-left: 10px; vertical-align: middle;">Show Previous Hints</button>
         </div>
         <form id="guess-form">
             <input type="text" id="guess-input" placeholder="Enter your guess" autocomplete="off" required list="countries-list" />
@@ -50,8 +50,8 @@
             <button class="close-modal" id="close-rules">&times;</button>
             <h2>How to Play</h2>
             <ul>
-                <li>The aim of this game is to guess the country in as few guesses as possible.</li>
-                <li>Every day a new country is chosen and you get 10 hints, one at a time to guess it.</li>
+                <li><b>The aim of this game is to guess the country in as few guesses as possible.</b></li>
+                <li>Every day a new country is chosen and you get 10 hints (each hint getting more obious), one at a time to guess it.</li>
                 <li>e.g if the country of the day is "United Kingdom", the first hint might be "It is located in Europe".</li>
                 <li>Enter your guess after each hint. You have one guess per hint.</li>
                 <li>If you guess correctly, the flag is revealed and you win!</li>
@@ -59,6 +59,13 @@
                 <li>The game resets with a new country every day at 12:00 AM British time.</li>
                 <li><b>Disclaimer:</b> This game only includes countries that are full members of the United Nations. Disputed territories or partially recognized states are not part of the game.</li>
             </ul>
+        </div>
+    </div>
+    <div id="hints-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <button class="close-modal" id="close-hints">&times;</button>
+            <h2>Previous Hints</h2>
+            <ul id="hints-list" style="padding-left: 20px;"></ul>
         </div>
     </div>
     <footer class="site-footer">© July 2025 Jonathan Williams. All rights reserved.</footer>

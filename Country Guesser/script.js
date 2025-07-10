@@ -166,6 +166,10 @@ function resetGameUI() {
     showQuestionMark();
     showHint();
     hideShareButton();
+    
+    // Hide show hints button on reset
+    const showHintsBtn = document.getElementById('show-hints-btn');
+    if (showHintsBtn) showHintsBtn.style.display = 'none';
 }
 
 
@@ -263,107 +267,160 @@ function initializeGame() {
 // Start loading the countries data
 loadCountries();
 
-// Modal logic for rules
-const infoBtn = document.getElementById('info-btn');
-const rulesModal = document.getElementById('rules-modal');
-const closeRulesBtn = document.getElementById('close-rules');
+document.addEventListener('DOMContentLoaded', function() {
+    // Modal logic for rules
+    const infoBtn = document.getElementById('info-btn');
+    const rulesModal = document.getElementById('rules-modal');
+    const closeRulesBtn = document.getElementById('close-rules');
 
-infoBtn.addEventListener('click', () => {
+    infoBtn.addEventListener('click', () => {
+        rulesModal.style.display = 'flex';
+        closeRulesBtn.focus();
+    });
+
+    closeRulesBtn.addEventListener('click', () => {
+        rulesModal.style.display = 'none';
+        infoBtn.focus();
+    });
+
+    // Close modal when clicking outside modal-content
+    rulesModal.addEventListener('mousedown', (e) => {
+        if (e.target === rulesModal) {
+            rulesModal.style.display = 'none';
+            infoBtn.focus();
+        }
+    });
+
+    // Close modal on Escape key
+    window.addEventListener('keydown', (e) => {
+        if (rulesModal.style.display === 'flex' && e.key === 'Escape') {
+            rulesModal.style.display = 'none';
+            infoBtn.focus();
+        }
+    });
+
+    // Show rules modal on page load
     rulesModal.style.display = 'flex';
     closeRulesBtn.focus();
-});
 
-closeRulesBtn.addEventListener('click', () => {
-    rulesModal.style.display = 'none';
-    infoBtn.focus();
-});
+    // Add global error logging
+    window.onerror = function(message, source, lineno, colno, error) {
+        console.error('Global JS Error:', message, source, lineno, colno, error);
+        // Removed alert to prevent user confusion when site works fine
+    };
 
-// Close modal when clicking outside modal-content
-rulesModal.addEventListener('mousedown', (e) => {
-    if (e.target === rulesModal) {
-        rulesModal.style.display = 'none';
-        infoBtn.focus();
+    // Helper: Only allow guesses that match a country in ALL_COUNTRY_NAMES
+    function isValidCountryGuess(guess) {
+        return ALL_COUNTRY_NAMES.some(name => name.toLowerCase() === guess.trim().toLowerCase());
     }
-});
 
-// Close modal on Escape key
-window.addEventListener('keydown', (e) => {
-    if (rulesModal.style.display === 'flex' && e.key === 'Escape') {
-        rulesModal.style.display = 'none';
-        infoBtn.focus();
-    }
-});
-
-// Add global error logging
-window.onerror = function(message, source, lineno, colno, error) {
-    console.error('Global JS Error:', message, source, lineno, colno, error);
-    // Removed alert to prevent user confusion when site works fine
-};
-
-// Helper: Only allow guesses that match a country in ALL_COUNTRY_NAMES
-function isValidCountryGuess(guess) {
-    return ALL_COUNTRY_NAMES.some(name => name.toLowerCase() === guess.trim().toLowerCase());
-}
-
-guessForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    if (gameOver) return;
-    const guess = guessInput.value.trim();
-    if (!isValidCountryGuess(guess)) {
-        resultElem.textContent = 'Please enter a valid guess';
-        resultElem.style.color = '#e74c3c';
-        return;
-    }
-    // Check for duplicate guess (case-insensitive)
-    if (previousGuesses.some(g => g.toLowerCase() === guess.toLowerCase())) {
-        resultElem.textContent = 'This country has already been guessed.';
-        resultElem.style.color = '#e74c3c';
-        return;
-    }
-    previousGuesses.push(guess);
-    guessesUsed++;
-    if (guess.toLowerCase() === country.name.toLowerCase()) {
-        endGame(true);
-    } else {
-        currentHint++;
-        if (currentHint < country.hints.length) {
-            showHint();
-            const hintsLeft = country.hints.length - currentHint;
-            resultElem.textContent = `Incorrect, you have ${hintsLeft} hint${hintsLeft === 1 ? '' : 's'} remaining.`;
-            resultElem.style.color = '#e67e22';
+    guessForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (gameOver) return;
+        const guess = guessInput.value.trim();
+        if (!isValidCountryGuess(guess)) {
+            resultElem.textContent = 'Please enter a valid guess';
+            resultElem.style.color = '#e74c3c';
+            return;
+        }
+        // Check for duplicate guess (case-insensitive)
+        if (previousGuesses.some(g => g.toLowerCase() === guess.toLowerCase())) {
+            resultElem.textContent = 'This country has already been guessed.';
+            resultElem.style.color = '#e74c3c';
+            return;
+        }
+        previousGuesses.push(guess);
+        guessesUsed++;
+        if (guess.toLowerCase() === country.name.toLowerCase()) {
+            endGame(true);
         } else {
-            endGame(false);
+            currentHint++;
+            if (currentHint < country.hints.length) {
+                showHint();
+                const hintsLeft = country.hints.length - currentHint;
+                resultElem.textContent = `Incorrect, you have ${hintsLeft} hint${hintsLeft === 1 ? '' : 's'} remaining.`;
+                resultElem.style.color = '#e67e22';
+                
+                // Show the show hints button after the second hint
+                if (currentHint >= 1) {
+                    const showHintsBtn = document.getElementById('show-hints-btn');
+                    if (showHintsBtn) showHintsBtn.style.display = 'inline-block';
+                }
+            } else {
+                endGame(false);
+            }
+        }
+        guessInput.value = '';
+    });
+
+    // Dynamically show datalist only after 2+ characters
+    const datalistId = 'countries-list';
+    function handleGuessInputDatalist() {
+        if (guessInput.value.trim().length >= 2) {
+            guessInput.setAttribute('list', datalistId);
+        } else {
+            guessInput.removeAttribute('list');
         }
     }
-    guessInput.value = '';
-});
+    guessInput.addEventListener('input', handleGuessInputDatalist);
+    // On page load, ensure correct state
+    handleGuessInputDatalist();
 
-// Dynamically show datalist only after 2+ characters
-const datalistId = 'countries-list';
-function handleGuessInputDatalist() {
-    if (guessInput.value.trim().length >= 2) {
-        guessInput.setAttribute('list', datalistId);
-    } else {
-        guessInput.removeAttribute('list');
-    }
-}
-guessInput.addEventListener('input', handleGuessInputDatalist);
-// On page load, ensure correct state
-handleGuessInputDatalist();
+    guessInput.addEventListener('focus', function() {
+        if (guessInput.value.trim().length < 2) {
+            guessInput.removeAttribute('list');
+        }
+    });
+    guessInput.addEventListener('click', function() {
+        if (guessInput.value.trim().length < 2) {
+            guessInput.removeAttribute('list');
+        }
+    });
 
-guessInput.addEventListener('focus', function() {
-    if (guessInput.value.trim().length < 2) {
-        guessInput.removeAttribute('list');
+    // Support Me button logic
+    const supportBtn = document.getElementById('support-btn');
+    if (supportBtn) {
+        supportBtn.addEventListener('click', function() {
+            window.open('https://buymeacoffee.com/jonathanwilliams', '_blank');
+        });
     }
-});
-guessInput.addEventListener('click', function() {
-    if (guessInput.value.trim().length < 2) {
-        guessInput.removeAttribute('list');
-    }
-});
 
-// Support Me button logic
-const supportBtn = document.getElementById('support-btn');
-supportBtn.addEventListener('click', function() {
-    window.open('https://buymeacoffee.com/jonathanwilliams', '_blank');
+    // Add after DOM element selections
+    const showHintsBtn = document.getElementById('show-hints-btn');
+    const hintsModal = document.getElementById('hints-modal');
+    const closeHintsBtn = document.getElementById('close-hints');
+    const hintsList = document.getElementById('hints-list');
+
+    // Hide show hints button initially
+    if (showHintsBtn) showHintsBtn.style.display = 'none';
+
+    // Show all previous hints in modal
+    function showAllPreviousHints() {
+        if (!country || !country.hints) return;
+        hintsList.innerHTML = '';
+        for (let i = 0; i <= currentHint && i < country.hints.length; i++) {
+            const li = document.createElement('li');
+            li.textContent = `Hint ${i + 1}: ${country.hints[i]}`;
+            hintsList.appendChild(li);
+        }
+        hintsModal.style.display = 'flex';
+        closeHintsBtn.focus();
+    }
+    if (showHintsBtn) showHintsBtn.addEventListener('click', showAllPreviousHints);
+    if (closeHintsBtn) closeHintsBtn.addEventListener('click', () => {
+        hintsModal.style.display = 'none';
+        showHintsBtn.focus();
+    });
+    if (hintsModal) hintsModal.addEventListener('mousedown', (e) => {
+        if (e.target === hintsModal) {
+            hintsModal.style.display = 'none';
+            showHintsBtn.focus();
+        }
+    });
+    window.addEventListener('keydown', (e) => {
+        if (hintsModal && hintsModal.style.display === 'flex' && e.key === 'Escape') {
+            hintsModal.style.display = 'none';
+            showHintsBtn.focus();
+        }
+    });
 }); 
