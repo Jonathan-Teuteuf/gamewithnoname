@@ -18,7 +18,7 @@ const ALL_COUNTRY_NAMES = [
 // Deterministically select today's country based on the date
 function getTodayCountryIndex() {
     // Start date: 8th July 2025 (months are 0-based, so 6 = July)
-    const startDate = new Date(2025, 6, 8);
+    const startDate = new Date(2025, 6, 23);
     const dateToUse = TEST_MODE ? virtualDate : new Date();
     const msPerDay = 24 * 60 * 60 * 1000;
     const daysSinceStart = Math.floor((dateToUse - startDate) / msPerDay);
