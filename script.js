@@ -36,15 +36,14 @@ function updateNameHintText() {
     const nameHintText = document.getElementById('name-hint-text');
     if (!nameHintText) return;
     
-    const lettersToReveal = Math.floor(guessesUsed / 3);
     let displayText = '';
     
-    for (let i = 0; i < countryName.length; i++) {
-        if (i < lettersToReveal) {
-            displayText += countryName[i];
-        } else {
-            displayText += '_';
-        }
+    if (guessesUsed >= 8) {
+        // Show only the first letter after 8 guesses
+        displayText = countryName[0] + '_'.repeat(countryName.length - 1);
+    } else {
+        // Show all underscores before 8 guesses
+        displayText = '_'.repeat(countryName.length);
     }
     
     nameHintText.textContent = displayText;
