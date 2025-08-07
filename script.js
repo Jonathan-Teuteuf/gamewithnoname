@@ -5,7 +5,7 @@ const TEST_COUNTDOWN_SECONDS = 30; // 30 seconds for testing
 // For test mode: track virtual date that changes every TEST_COUNTDOWN_SECONDS
 let virtualDate = new Date();
 
-// Countries data will be loaded from JSON
+// Countries data will be loaded from JSON file
 let countries = [];
 
 // Difficulty settings state
