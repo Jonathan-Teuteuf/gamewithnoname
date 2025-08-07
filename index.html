@@ -21,15 +21,38 @@
         <button id="dark-mode-toggle">🌙 Dark Mode</button>
         <button id="info-btn" title="Game Rules">ℹ️ How to Play</button>
     </div>
+    <div class="difficulty-settings">
+        <h3>Difficulty Settings</h3>
+        <div class="toggle-container">
+            <label class="toggle-label">
+                <span>Name Hint</span>
+                <span class="info-icon" title="Shows the country name with letters revealed every 3 guesses">ℹ️</span>
+                <input type="checkbox" id="name-hint-toggle">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+        <div class="toggle-container">
+            <label class="toggle-label">
+                <span>Flag Hint</span>
+                <span class="info-icon" title="Shows a blurred version of the country's flag">ℹ️</span>
+                <input type="checkbox" id="flag-hint-toggle">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+    </div>
     <div class="container">
         <h1>Country Guesser</h1>
         <div id="image-container">
             <img id="country-image" src="https://cdn.pixabay.com/photo/2015/12/23/23/15/question-mark-1106309_1280.png" alt="Country Flag or Question Mark">
         </div>
         <div id="hint-container">
-            <span id="hint-label">Hint 1:</span>
+            <span id="hint-label">Clue 1:</span>
             <span id="hint"></span>
-            <button id="show-hints-btn" title="Show all previous hints" style="margin-left: 10px; vertical-align: middle;">Show Previous Hints</button>
+            <button id="show-hints-btn" title="Show all previous clues" style="margin-left: 10px; vertical-align: middle;">Show Previous Clues</button>
+            <div id="name-hint" style="display: none; margin-top: 10px; text-align: center;">
+                <span>Country name: </span><span id="name-hint-text" style="font-family: monospace; font-weight: bold;"></span>
+            </div>
         </div>
         <form id="guess-form">
             <input type="text" id="guess-input" placeholder="Enter your guess" autocomplete="off" required list="countries-list" />
@@ -48,11 +71,12 @@
             <h2>How to Play</h2>
             <ul>
                 <li><b>The aim of this game is to guess the country in as few guesses as possible.</b></li>
-                <li>Every day a new country is chosen and you get 10 hints (each hint getting more obious), one at a time to guess it.</li>
-                <li>e.g if the country of the day is "United Kingdom", the first hint might be "It is located in Europe".</li>
-                <li>Enter your guess after each hint. You have one guess per hint.</li>
+                <li>Every day a new country is chosen and you get 10 clues (each clue getting more obious), one at a time to guess it.</li>
+                <li>e.g if the country of the day is "United Kingdom", the first clue might be "It is located in Europe".</li>
+                <li>Enter your guess after each clue. You have one guess per clue.</li>
                 <li>If you guess correctly, the flag is revealed and you win!</li>
-                <li>If you use all 10 hints, you lose and the answer and flag are revealed.</li>
+                <li>If you use all 10 clues, you lose and the answer and flag are revealed.</li>
+                <li>Use the difficulty toogles if you want an easier experience.</li>
                 <li>The game resets with a new country every day at 12:00 AM British time.</li>
                 <li><b>Disclaimer:</b> This game only includes countries that are full members of the United Nations. Disputed territories or partially recognized states are not part of the game.</li>
             </ul>
@@ -65,7 +89,7 @@
             <ul id="hints-list" style="padding-left: 20px;"></ul>
         </div>
     </div>
-    <footer class="site-footer">© July 2025 Jonathan Williams. All rights reserved.</footer>
+    <footer class="site-footer">© 2025 Jonathan Williams. All rights reserved.</footer>
     <script src="script.js"></script>
 </body>
 </html> 

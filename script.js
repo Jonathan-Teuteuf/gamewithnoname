@@ -8,6 +8,64 @@ let virtualDate = new Date();
 // Countries data will be loaded from JSON
 let countries = [];
 
+// Difficulty settings state
+let nameHintEnabled = false;
+let flagHintEnabled = false;
+
+// Name hint functionality
+let countryName = '';
+
+// Function to create name hint
+function createNameHint() {
+    if (!nameHintEnabled || !country) return;
+    
+    const nameHintContainer = document.getElementById('name-hint');
+    const nameHintText = document.getElementById('name-hint-text');
+    
+    if (!nameHintContainer || !nameHintText) return;
+    
+    countryName = country.name;
+    nameHintContainer.style.display = 'block';
+    updateNameHintText();
+}
+
+// Function to update the name hint text based on guesses
+function updateNameHintText() {
+    if (!nameHintEnabled || !countryName) return;
+    
+    const nameHintText = document.getElementById('name-hint-text');
+    if (!nameHintText) return;
+    
+    const lettersToReveal = Math.floor(guessesUsed / 3);
+    let displayText = '';
+    
+    for (let i = 0; i < countryName.length; i++) {
+        if (i < lettersToReveal) {
+            displayText += countryName[i];
+        } else {
+            displayText += '_';
+        }
+    }
+    
+    nameHintText.textContent = displayText;
+}
+
+// Function to update flag hint
+function updateFlagHint() {
+    const imageElem = document.getElementById('country-image');
+    if (!imageElem) return;
+    
+    if (flagHintEnabled && country) {
+        imageElem.src = country.flag;
+        imageElem.alt = country.name + ' Flag (Blurred)';
+        imageElem.style.filter = 'blur(15px)';
+    } else {
+        imageElem.src = QUESTION_MARK_IMG;
+        imageElem.alt = 'Country Flag or Question Mark';
+        imageElem.style.filter = 'none';
+    }
+}
+
 const QUESTION_MARK_IMG = "https://cdn.pixabay.com/photo/2015/12/23/23/15/question-mark-1106309_1280.png"; // You should provide this image in your project
 
 // Full list of country names for autocomplete
@@ -68,18 +126,26 @@ darkModeToggle.addEventListener('click', () => {
 })();
 
 function showHint() {
-    hintLabel.textContent = `Hint ${currentHint + 1}:`;
+    hintLabel.textContent = `Clue ${currentHint + 1}:`;
     hintElem.textContent = country.hints[currentHint];
 }
 
 function showFlag() {
     imageElem.src = country.flag;
     imageElem.alt = country.name + ' Flag';
+    imageElem.style.filter = 'none'; // Remove blur when showing flag at end of game
 }
 
 function showQuestionMark() {
-    imageElem.src = QUESTION_MARK_IMG;
-    imageElem.alt = 'Country Flag or Question Mark';
+    if (flagHintEnabled && country) {
+        imageElem.src = country.flag;
+        imageElem.alt = country.name + ' Flag (Blurred)';
+        imageElem.style.filter = 'blur(15px)';
+    } else {
+        imageElem.src = QUESTION_MARK_IMG;
+        imageElem.alt = 'Country Flag or Question Mark';
+        imageElem.style.filter = 'none';
+    }
 }
 
 // Create share button (hidden by default)
@@ -138,6 +204,13 @@ function endGame(success) {
     document.getElementById('submit-btn').disabled = true;
     document.getElementById('hint-container').style.display = 'none';
     guessForm.style.display = 'none';
+    
+    // Hide name hint when game ends
+    const nameHintContainer = document.getElementById('name-hint');
+    if (nameHintContainer) {
+        nameHintContainer.style.display = 'none';
+    }
+    
     if (success) {
         resultElem.textContent = 'Correct! The country is ' + country.name + '!';
         resultElem.style.color = '#27ae60';
@@ -167,9 +240,15 @@ function resetGameUI() {
     showHint();
     hideShareButton();
     
-    // Hide show hints button on reset
+    // Hide show clues button on reset
     const showHintsBtn = document.getElementById('show-hints-btn');
     if (showHintsBtn) showHintsBtn.style.display = 'none';
+    
+    // Create name hint if enabled
+    createNameHint();
+    
+    // Update flag hint
+    updateFlagHint();
 }
 
 
@@ -268,6 +347,33 @@ function initializeGame() {
 loadCountries();
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Difficulty settings toggle functionality
+    const nameHintToggle = document.getElementById('name-hint-toggle');
+    const flagHintToggle = document.getElementById('flag-hint-toggle');
+    
+    // Initialize toggle states
+    nameHintToggle.checked = nameHintEnabled;
+    flagHintToggle.checked = flagHintEnabled;
+    
+    // Add event listeners for toggles
+    nameHintToggle.addEventListener('change', function() {
+        nameHintEnabled = this.checked;
+        console.log('Name hint enabled:', nameHintEnabled);
+        
+        const nameHintContainer = document.getElementById('name-hint');
+        if (nameHintEnabled && country) {
+            createNameHint();
+        } else if (nameHintContainer) {
+            nameHintContainer.style.display = 'none';
+        }
+    });
+    
+    flagHintToggle.addEventListener('change', function() {
+        flagHintEnabled = this.checked;
+        console.log('Flag hint enabled:', flagHintEnabled);
+        updateFlagHint();
+    });
+    
     // Modal logic for rules
     const infoBtn = document.getElementById('info-btn');
     const rulesModal = document.getElementById('rules-modal');
@@ -331,17 +437,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         previousGuesses.push(guess);
         guessesUsed++;
+        
+        // Update name hint text
+        updateNameHintText();
+        
         if (guess.toLowerCase() === country.name.toLowerCase()) {
             endGame(true);
         } else {
             currentHint++;
             if (currentHint < country.hints.length) {
                 showHint();
-                const hintsLeft = country.hints.length - currentHint;
-                resultElem.textContent = `Incorrect, you have ${hintsLeft} hint${hintsLeft === 1 ? '' : 's'} remaining.`;
+                const cluesLeft = country.hints.length - currentHint;
+                resultElem.textContent = `Incorrect, you have ${cluesLeft} clue${cluesLeft === 1 ? '' : 's'} remaining.`;
                 resultElem.style.color = '#e67e22';
                 
-                // Show the show hints button after the second hint
+                // Show the show clues button after the second clue
                 if (currentHint >= 1) {
                     const showHintsBtn = document.getElementById('show-hints-btn');
                     if (showHintsBtn) showHintsBtn.style.display = 'inline-block';
@@ -391,16 +501,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeHintsBtn = document.getElementById('close-hints');
     const hintsList = document.getElementById('hints-list');
 
-    // Hide show hints button initially
+    // Hide show clues button initially
     if (showHintsBtn) showHintsBtn.style.display = 'none';
 
-    // Show all previous hints in modal
+    // Show all previous clues in modal
     function showAllPreviousHints() {
         if (!country || !country.hints) return;
         hintsList.innerHTML = '';
         for (let i = 0; i <= currentHint && i < country.hints.length; i++) {
             const li = document.createElement('li');
-            li.textContent = `Hint ${i + 1}: ${country.hints[i]}`;
+            li.textContent = `Clue ${i + 1}: ${country.hints[i]}`;
             hintsList.appendChild(li);
         }
         hintsModal.style.display = 'flex';
