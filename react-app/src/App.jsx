@@ -29,8 +29,8 @@ function formatTime(msRemaining, showHours) {
 // concrete strings using the daily country's data once loaded.
 const cluesByDifficulty = {
   hard: [
-    (d) => d?.latitude ? `It's latitude is: ${d.latitude}.` : null,
-    (d) => d?.longitude ? `It's longitude is: ${d.longitude}.` : null,
+    (d) => d?.latitude ? `Its latitude is: ${d.latitude}.` : null,
+    (d) => d?.longitude ? `Its longitude is: ${d.longitude}.` : null,
     (d) => Array.isArray(d?.borders) && d.borders.length ? `It borders ${d.borders.length} countries.` : null,
     (d) => d?.capital ? `Its capital city is not its largest city.` : null,
     (d) => typeof d?.size === 'number' ? `Its area is around ${Math.round(d.size / 1000) * 1000} km².` : null,
