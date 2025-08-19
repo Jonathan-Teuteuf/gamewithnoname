@@ -1,0 +1,205 @@
+/* Inject original game's CSS */
+:root {
+    --bg: #f0f4f8;
+    --container-bg: #fff;
+    --text: #2a3d4d;
+    --input-bg: #fff;
+    --input-border: #b0b8c1;
+    --button-bg: #2a8cff;
+    --button-hover: #1769aa;
+    --result-wrong: #e74c3c;
+    --result-correct: #27ae60;
+    --result-try: #e67e22;
+}
+
+body {
+    background: var(--bg);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: block;
+    overflow-y: auto;
+    transition: background 0.3s;
+}
+
+body.dark {
+    --bg: #181c24;
+    --container-bg: #232a36;
+    --text: #f0f4f8;
+    --input-bg: #232a36;
+    --input-border: #3a4250;
+    --button-bg: #3a7cff;
+    --button-hover: #1a3a6b;
+    --result-wrong: #ff7675;
+    --result-correct: #55efc4;
+    --result-try: #ffe066;
+}
+
+/* Removed fixed sizing for #dark-mode-toggle to allow responsive rules in public/style.css */
+
+.container {
+    max-width: 540px;
+    width: 95vw;
+    margin: 48px auto 32px auto;
+    text-align: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1003;
+    transition: background 0.3s;
+}
+
+h1 {
+    margin-bottom: 24px;
+    color: var(--text);
+}
+
+#image-container {
+    margin-bottom: 24px;
+    width: 100%;
+    aspect-ratio: 3/2;
+    background: #e0e7ef;
+    border: 2px solid #d1d9e6;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+body.dark #image-container {
+    background: #232a36;
+    border-color: #3a4250;
+}
+
+#country-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 8px;
+    transition: box-shadow 0.2s;
+}
+
+#hint-container {
+    margin-bottom: 16px;
+    font-size: 1.1em;
+    color: var(--text);
+}
+
+#guess-form {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    justify-content: center;
+}
+
+#guess-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--input-border);
+    border-radius: 6px;
+    font-size: 1em;
+    background: var(--input-bg);
+    color: var(--text);
+    transition: background 0.3s, color 0.3s;
+}
+
+#submit-btn {
+    padding: 8px 16px;
+    background: var(--button-bg);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#submit-btn:hover {
+    background: var(--button-hover);
+}
+
+#result {
+    min-height: 24px;
+    font-size: 1.1em;
+    margin-bottom: 16px;
+    color: var(--result-wrong);
+    font-weight: bold;
+}
+
+#countdown-container {
+    margin-top: 16px;
+    font-size: 1em;
+    color: var(--text);
+}
+
+.top-left-controls {
+    position: fixed;
+    top: 10px;
+    left: 20px;
+    z-index: 1002;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.difficulty-settings {
+    position: fixed;
+    top: 10px;
+    right: 20px;
+    z-index: 1002;
+    background: var(--container-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    min-width: 200px;
+}
+
+.difficulty-settings h3 {
+    margin: 0 0 12px 0;
+    font-size: 1em;
+    color: var(--text);
+    text-align: center;
+    font-weight: 600;
+}
+
+.toggle-container { margin-bottom: 10px; }
+.toggle-container:last-child { margin-bottom: 0; }
+.toggle-label { display: flex; align-items: center; justify-content: space-between; cursor: pointer; font-size: 0.9em; color: var(--text); }
+.toggle-label span:first-child { flex: 1; margin-right: 12px; }
+.info-icon { font-size: 0.8em; color: var(--text); opacity: 0.7; margin-right: 8px; cursor: help; transition: opacity 0.2s; }
+.info-icon:hover { opacity: 1; }
+.toggle-label input[type="checkbox"] { display: none; }
+.toggle-slider { position: relative; width: 44px; height: 24px; background: var(--input-border); border-radius: 12px; transition: background 0.3s; display: inline-block; }
+.toggle-slider:before { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: transform 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+.toggle-label input[type="checkbox"]:checked + .toggle-slider { background: var(--button-bg); }
+.toggle-label input[type="checkbox"]:checked + .toggle-slider:before { transform: translateX(20px); }
+
+#name-hint { margin-top: 10px; text-align: center; }
+#name-hint-text { font-family: monospace; font-weight: bold; font-size: 1.5em; color: var(--text); letter-spacing: 2px; }
+
+/* Modal styles and footer */
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; z-index: 2000; transition: background 0.3s; }
+.modal-content { background: var(--container-bg); color: var(--text); border-radius: 12px; padding: 32px 24px 24px 24px; max-width: 350px; width: 90vw; box-shadow: 0 8px 32px rgba(0,0,0,0.18); position: relative; text-align: left; animation: modalIn 0.2s; }
+@keyframes modalIn { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.close-modal { position: absolute; top: 10px; right: 14px; background: none; border: none; font-size: 1.5em; color: var(--text); cursor: pointer; transition: color 0.2s; }
+.close-modal:hover { color: var(--result-wrong); }
+.site-footer { width: 100%; text-align: center; font-size: 1em; color: #7a869a; background: rgba(255,255,255,0.92); padding: 18px 0 12px 0; box-shadow: 0 -2px 12px rgba(0,0,0,0.03); position: fixed; left: 0; bottom: 0; z-index: 100; }
+body.dark .site-footer { background: #232a36; color: #7a869a; }
+
+#show-hints-btn { background: var(--button-bg); color: #fff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 0.98em; cursor: pointer; margin-left: 10px; transition: background 0.2s, color 0.2s, box-shadow 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.07); outline: none; vertical-align: middle; }
+#show-hints-btn:hover, #show-hints-btn:focus { background: var(--button-hover); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+
+#hints-modal .modal-content { max-width: 400px; width: 92vw; padding: 28px 20px 20px 20px; font-size: 1.05em; background: var(--container-bg); color: var(--text); border-radius: 14px; box-shadow: 0 8px 32px rgba(0,0,0,0.18); text-align: left; position: relative; animation: modalIn 0.2s; }
+#hints-modal h2 { font-size: 1.3em; margin-bottom: 16px; color: var(--button-bg); }
+#hints-list { list-style: disc inside; padding-left: 0; margin: 0; max-height: 220px; overflow-y: auto; }
+#hints-list li { margin-bottom: 8px; padding: 7px 10px; background: rgba(42,140,255,0.07); border-radius: 6px; color: var(--text); font-size: 1em; transition: background 0.2s; }
+body.dark #hints-list li { background: rgba(58,124,255,0.13); color: #f0f4f8; }
+#close-hints { position: absolute; top: 10px; right: 14px; background: none; border: none; font-size: 1.5em; color: var(--text); cursor: pointer; transition: color 0.2s; }
+#close-hints:hover { color: var(--result-wrong); }
+
+/* Media queries from original CSS omitted for brevity */
