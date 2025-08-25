@@ -5,7 +5,7 @@ import confetti from "canvas-confetti";
 const QUESTION_MARK_IMG = 'https://cdn.pixabay.com/photo/2015/12/23/23/15/question-mark-1106309_1280.png';
 
 
-const TEST_MODE = true;
+const TEST_MODE = false;
 const TEST_COUNTDOWN_SECONDS = 1000000;
 const NAMES_SOURCE_URL = 'https://cdn-assets.teuteuf.fr/data/common/countries.json';
 const CITIES_SOURCE_URL = 'https://cdn-assets.teuteuf.fr/data/common/cities.json';
