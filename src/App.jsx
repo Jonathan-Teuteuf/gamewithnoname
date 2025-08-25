@@ -215,12 +215,18 @@ function formatTime(msRemaining, showHours) {
     .padStart(2, '0')}`;
 }
 
+// Format numbers with commas for readability (e.g., 1000000 -> 1,000,000)
+function formatNumberWithCommas(value) {
+  if (typeof value !== 'number') return value;
+  return value.toLocaleString('en-GB');
+}
+
 // Hardcoded clue templates grouped by difficulty. These will be turned into
 // concrete strings using the daily country's data once loaded.
 const cluesByDifficulty = {
   hard: [
     (d, namesSourceItems, citiesData, answerCode, productsData, languagesData, seededRandom, geogridData) => Array.isArray(d?.borders) && d.borders.length ? `It borders ${d.borders.length} countries.` : null,
-    (d, namesSourceItems, citiesData, answerCode, productsData, languagesData, seededRandom, geogridData) => typeof d?.size === 'number' ? `Its area is around ${d.size} km².` : null,
+    (d, namesSourceItems, citiesData, answerCode, productsData, languagesData, seededRandom, geogridData) => typeof d?.size === 'number' ? `Its area is around ${formatNumberWithCommas(d.size)} km².` : null,
     (d, namesSourceItems, citiesData, answerCode, productsData, languagesData, seededRandom, geogridData) => {
       const cityName = getRandomNonCapitalCity(answerCode, citiesData, seededRandom);
       return cityName ? `A city from this country is ${cityName}.` : null;
@@ -247,8 +253,8 @@ const cluesByDifficulty = {
       }
       return "This country does not have an animal on its flag"
     },
-    (d, namesSourceItems, citiesData, answerCode, productsData, languagesData, seededRandom, geogridData) => geogridData?.geographyInfo?.coastlineLength ? `Its coastline is ${geogridData.geographyInfo.coastlineLength} km long` : null,
-    (d, namesSourceItems, citiesData, answerCode, productsData, languagesData, seededRandom, geogridData) => geogridData?.economicInfo?.GDPPerCapita ? `This countries GDP per capita is ${geogridData.economicInfo.GDPPerCapita} US dollars.` : null,
+    (d, namesSourceItems, citiesData, answerCode, productsData, languagesData, seededRandom, geogridData) => typeof geogridData?.geographyInfo?.coastlineLength === 'number' ? `Its coastline is ${formatNumberWithCommas(geogridData.geographyInfo.coastlineLength)} km long` : null,
+    (d, namesSourceItems, citiesData, answerCode, productsData, languagesData, seededRandom, geogridData) => typeof geogridData?.economicInfo?.GDPPerCapita === 'number' ? `This countries GDP per capita is ${formatNumberWithCommas(geogridData.economicInfo.GDPPerCapita)} US dollars.` : null,
     (d, namesSourceItems, citiesData, answerCode, productsData, languagesData, seededRandom, geogridData) => {
       if (geogridData?.politicalInfo?.hasNuclearWeapons) {
         return "This country has nuclear weapons.";
@@ -275,7 +281,7 @@ const cluesByDifficulty = {
     },
   ],
   medium: [
-    (d, namesSourceItems, citiesData, answerCode, productsData, languagesData, seededRandom, geogridData) => typeof d?.population === 'number' ? `Population is roughly ${d.population} people.` : null,
+    (d, namesSourceItems, citiesData, answerCode, productsData, languagesData, seededRandom, geogridData) => typeof d?.population === 'number' ? `Population is roughly ${formatNumberWithCommas(d.population)} people.` : null,
     (d, namesSourceItems, citiesData, answerCode, productsData, languagesData, seededRandom, geogridData) => {
       if (!d?.currencyData) return null;
       const name = d.currencyData.name || (Array.isArray(d.currencyData.nameChoices) ? d.currencyData.nameChoices[0] : null);
@@ -300,7 +306,7 @@ const cluesByDifficulty = {
       }
       return "This country is not landlocked"
     },
-    (d, namesSourceItems, citiesData, answerCode, productsData, languagesData, seededRandom, geogridData) => geogridData?.sportsInfo?.olympicMedals ? `Has ${geogridData.sportsInfo.olympicMedals} Olympic medals.` : `It has no olympic medals`,
+    (d, namesSourceItems, citiesData, answerCode, productsData, languagesData, seededRandom, geogridData) => typeof geogridData?.sportsInfo?.olympicMedals === 'number' ? `Has ${formatNumberWithCommas(geogridData.sportsInfo.olympicMedals)} Olympic medals.` : `It has no olympic medals`,
     (d, namesSourceItems, citiesData, answerCode, productsData, languagesData, seededRandom, geogridData) => {
       if (geogridData?.politicalInfo?.isMonarchy) {
         return "This country is a monarchy.";
@@ -1012,8 +1018,8 @@ export default function App() {
   function handleShare(success) {
     if (!countryData) return;
     const message = success
-      ? `I bet you can't guess this country in less guesses than me! (${guessesUsed} guess${guessesUsed === 1 ? '' : 'es'}) https://gamewithnoname.vercel.app/`
-      : `This country is impossible to guess! https://gamewithnoname.vercel.app/`;
+      ? `I bet you can't guess this country in less guesses than me! (${guessesUsed} guess${guessesUsed === 1 ? '' : 'es'}) https://cluele.vercel.app/`
+      : `This country is impossible to guess! https://cluele.vercel.app/`;
     navigator.clipboard?.writeText(message).catch(() => {});
     if (navigator.share) {
       navigator.share({ text: message }).catch(() => {});
@@ -1058,7 +1064,7 @@ export default function App() {
       </div>
 
       <div className="difficulty-settings">
-        <h3>Difficulty Settings</h3>
+        <h3>Additional Hints</h3>
         <div className="toggle-container">
           <label className="toggle-label">
             <span>Name Hint</span>
